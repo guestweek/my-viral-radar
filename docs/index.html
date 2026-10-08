@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>agency_radar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0d13;
+    --card: #11151d;
+    --card-hi: #151a24;
+    --border: #1d2430;
+    --border-hi: #2c3546;
+    --text: #e8ecf3;
+    --muted: #8a94a6;
+    --faint: #5b6577;
+    --accent: #5ea1ff;
+    --green: #3fd68f;
+    --orange: #f0a33f;
+    --pink: #ff6b9d;
+    --red: #ff5c5c;
+    --fire1: #ff8a3d;
+    --fire2: #ff4d6d;
+    --font: 'Inter', -apple-system, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    --disp: 'Space Grotesk', 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scrollbar-color: #232c3b var(--bg); }
+  body { background: var(--bg); color: var(--text); font-family: var(--font);
+    -webkit-font-smoothing: antialiased; }
+  ::selection { background: rgba(94,161,255,.3); }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #232c3b; border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: #2c3546; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+  .ic { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round; fill: none; flex: none; }
+
+  header { position: sticky; top: 0; z-index: 50; background: rgba(10,13,19,.86);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border); padding: 13px 20px 12px; }
+  .hrow { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; max-width: 1440px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; }
+  .mark { width: 31px; height: 31px; border-radius: 9px; display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--fire1), var(--fire2));
+    box-shadow: 0 4px 16px rgba(255,92,80,.35); }
+  .mark .ic { width: 17px; height: 17px; color: #fff; }
+  h1 { font-family: var(--disp); font-size: 16.5px; font-weight: 700; letter-spacing: .2px; white-space: nowrap; line-height: 1.15; }
+  h1 small { display: block; color: var(--faint); font-family: var(--font); font-weight: 400;
+    font-size: 10.5px; letter-spacing: 0; }
+
+  .search { position: relative; }
+  .search > .ic { position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+    color: var(--faint); width: 13.5px; pointer-events: none; }
+  input#fSearch { background: var(--card); color: var(--text); border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 12px 8px 32px; font-size: 13px; font-family: var(--font);
+    width: 200px; transition: border-color .18s, background .18s; }
+  input#fSearch:hover { border-color: var(--border-hi); }
+  input#fSearch:focus { border-color: var(--accent); outline: none; }
+  input#fSearch::placeholder { color: var(--faint); }
+
+  select, .btn { background: var(--card); color: var(--text); border: 1px solid var(--border);
+    border-radius: 10px; padding: 8px 11px; font-size: 13px; font-family: var(--font);
+    cursor: pointer; transition: border-color .18s, background .18s, color .18s;
+    display: inline-flex; align-items: center; gap: 6px; }
+  select:hover, .btn:hover { border-color: var(--border-hi); background: var(--card-hi); }
+  .btn:active { transform: scale(.97); }
+  .btn.on { border-color: var(--accent); color: var(--accent); background: rgba(94,161,255,.08); }
+
+  .tabs { display: flex; gap: 7px; flex-wrap: wrap; max-width: 1440px; margin: 12px auto 0; }
+  .tab { display: inline-flex; align-items: center; gap: 7px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 999px; padding: 6.5px 14px;
+    font-size: 13px; color: var(--muted); cursor: pointer; user-select: none;
+    transition: border-color .18s, background .18s, color .18s, transform .18s; }
+  .tab:hover { border-color: var(--border-hi); color: var(--text); }
+  .tab .cnt { font-family: var(--disp); font-weight: 600; font-size: 11px;
+    background: rgba(255,255,255,.06); padding: 1.5px 7.5px; border-radius: 99px;
+    font-variant-numeric: tabular-nums; }
+  .tab.on { color: var(--text);
+    background: linear-gradient(135deg, rgba(255,138,61,.15), rgba(255,77,109,.15));
+    border-color: rgba(255,120,90,.45); }
+  .tab.on .cnt { background: rgba(255,120,90,.25); }
+  body.dragging .tab.droppable { border-style: dashed; border-color: var(--accent); }
+  .tab.over { background: rgba(94,161,255,.22); color: var(--text); transform: scale(1.07); }
+
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; max-width: 1440px; margin: 9px auto 0; align-items: center; }
+  .chips .lbl { font-size: 12px; color: var(--faint); margin-right: 2px; }
+  .chip2 { display: inline-flex; align-items: center; gap: 5.5px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 999px; padding: 4.5px 12px;
+    font-size: 12px; color: var(--muted); cursor: pointer; user-select: none;
+    transition: border-color .18s, color .18s, background .18s;
+    font-variant-numeric: tabular-nums; }
+  .chip2 .ic { width: 12.5px; height: 12.5px; }
+  .chip2:hover { border-color: var(--border-hi); color: var(--text); }
+  .chip2.on { border-color: rgba(240,163,63,.6); color: var(--orange); background: rgba(240,163,63,.08); }
+
+  main { max-width: 1440px; margin: 22px auto; padding: 0 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(305px, 1fr)); gap: 18px; }
+
+  .card { position: relative; background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; overflow: hidden; display: flex; flex-direction: column;
+    transition: transform .22s cubic-bezier(.2,.7,.3,1), border-color .22s, box-shadow .22s;
+    animation: fadeUp .45s cubic-bezier(.2,.7,.3,1) both; }
+  .card:hover { transform: translateY(-3px); border-color: var(--border-hi);
+    box-shadow: 0 12px 32px rgba(0,0,0,.45); }
+  .card.outlier::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--fire1), var(--fire2)); z-index: 2; }
+  .card[draggable] { cursor: grab; }
+  .card.lifting { opacity: .45; }
+  .card.saved { border-color: var(--green); }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .embed { position: relative; width: 100%; aspect-ratio: 4/5; background: #080b10; }
+  .embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .embed .ph { position: absolute; inset: 0; display: grid; place-items: center;
+    background: linear-gradient(110deg, #0b0e15 8%, #121826 18%, #0b0e15 33%);
+    background-size: 200% 100%; animation: shimmer 1.5s linear infinite; }
+  .embed .ph .ic { width: 30px; height: 30px; color: #2a3342; stroke-width: 1.6; }
+  @keyframes shimmer { to { background-position-x: -200%; } }
+
+  .meta { padding: 13px 15px 14px; display: flex; flex-direction: column; gap: 9px; }
+  .row1 { display: flex; align-items: center; gap: 7px; font-size: 13px; flex-wrap: wrap; }
+  .handle { color: #3a4456; cursor: grab; display: inline-flex; }
+  .handle .ic { width: 13px; height: 13px; }
+  .who { font-weight: 600; color: var(--accent); text-decoration: none; }
+  .who:hover { text-decoration: underline; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10.5px; font-weight: 500;
+    padding: 2.5px 8px; border-radius: 999px; border: 1px solid var(--border); color: var(--muted); }
+  .badge .ic { width: 10.5px; height: 10.5px; }
+  .badge.bnew { color: var(--pink); border-color: rgba(255,107,157,.45); background: rgba(255,107,157,.07); }
+  .badge.bhorse { color: var(--orange); border-color: rgba(240,163,63,.45); background: rgba(240,163,63,.07); }
+  .badge.bbait { color: var(--accent); border-color: rgba(94,161,255,.4); background: rgba(94,161,255,.07); }
+  .date { margin-left: auto; color: var(--faint); font-size: 11px; font-variant-numeric: tabular-nums; }
+
+  .nums { display: flex; gap: 6px; flex-wrap: wrap; }
+  .num { display: inline-flex; align-items: center; gap: 5px; background: #0c0f16;
+    border: 1px solid var(--border); border-radius: 9px; padding: 5px 9px;
+    font-size: 11px; color: var(--muted); }
+  .num .ic { width: 11.5px; height: 11.5px; }
+  .num b { font-family: var(--disp); color: var(--text); font-size: 12.5px; font-weight: 600;
+    font-variant-numeric: tabular-nums; }
+  .num.hot { border-color: rgba(255,122,77,.35); }
+  .num.hot .ic, .num.hot b { color: #ff7a4d; }
+  .num.x { border-color: rgba(240,163,63,.35); }
+  .num.x .ic, .num.x b { color: var(--orange); }
+  .num.er .ic, .num.er b { color: var(--green); }
+
+  .cap { color: var(--muted); font-size: 12.5px; line-height: 1.55; display: -webkit-box;
+    -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; cursor: pointer; }
+  .cap.open { -webkit-line-clamp: unset; }
+  .cap b { color: var(--text); font-weight: 600; }
+  .ai { border-left: 2px solid var(--orange); background: rgba(240,163,63,.06);
+    padding: 8px 11px; border-radius: 0 10px 10px 0; font-size: 12px; line-height: 1.65;
+    color: var(--muted); }
+  .ai b { color: var(--orange); font-weight: 600; }
+
+  .srow { display: flex; align-items: center; gap: 7px; }
+  .srow label { font-size: 12px; color: var(--faint); }
+  .status { flex: 1; padding: 6px 9px; font-size: 12.5px; }
+  .status.s未处理 { color: var(--muted); }
+  .status.s拍摄中 { color: var(--orange); border-color: rgba(240,163,63,.5); }
+  .status.s已处理 { color: var(--green); border-color: rgba(63,214,143,.5); }
+  .status.s跳过 { color: var(--red); border-color: rgba(255,92,92,.5); }
+  .abtn { display: inline-flex; align-items: center; gap: 5px; background: #0c0f16;
+    color: var(--muted); border: 1px solid var(--border); border-radius: 9px;
+    padding: 6px 10px; font-size: 11.5px; font-family: var(--font); cursor: pointer;
+    text-decoration: none; transition: color .18s, border-color .18s, transform .1s; }
+  .abtn .ic { width: 12px; height: 12px; }
+  .abtn:hover { color: var(--accent); border-color: rgba(94,161,255,.5); }
+  .abtn:active { transform: scale(.95); }
+
+  .more { text-align: center; margin: 28px 0 44px; }
+  .more button { background: var(--card); color: var(--accent); border: 1px solid var(--border);
+    border-radius: 12px; padding: 11px 30px; font-size: 14px; font-family: var(--font);
+    cursor: pointer; transition: border-color .18s, background .18s; }
+  .more button:hover { border-color: var(--border-hi); background: var(--card-hi); }
+
+  .empty { color: var(--faint); text-align: center; padding: 70px 0; display: flex;
+    flex-direction: column; align-items: center; gap: 12px; font-size: 14px; }
+  .empty .ic { width: 34px; height: 34px; stroke-width: 1.5; color: #2c3546; }
+
+  footer { color: var(--faint); font-size: 11px; text-align: center; padding: 22px; }
+
+  #toast { position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(8px);
+    background: var(--card-hi); border: 1px solid var(--border-hi); border-radius: 11px;
+    padding: 11px 20px; font-size: 13px; display: none; z-index: 99; opacity: 0;
+    box-shadow: 0 12px 32px rgba(0,0,0,.5); transition: opacity .2s, transform .2s; }
+  #toast.show { display: block; opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><path d="M22 7l-8.5 8.5-5-5L2 17"/><path d="M16 7h6v6"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.6 7-6.2-3.7-6.2 3.7 1.6-7L2 9.5l7.1-.6z"/></symbol>
+  <symbol id="i-magnet" viewBox="0 0 24 24"><path d="m6 15-4-4 6.75-6.77a7.79 7.79 0 0 1 11 11L13 22l-4-4 6.39-6.36a2.14 2.14 0 0 0-3-3L6 15"/><path d="m5 8 4 4"/><path d="m12 15 4 4"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M9 12h6"/><path d="M9 16h6"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><path d="m10 8 6 4-6 4Z"/><rect x="2" y="4" width="20" height="16" rx="3"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="5" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
+  <symbol id="i-pct" viewBox="0 0 24 24"><path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><path d="M12 19v3"/></symbol>
+</svg>
+<header>
+  <div class="hrow">
+    <div class="brand">
+      <div class="mark"><svg class="ic"><use href="#i-flame"/></svg></div>
+      <h1>agency_radar<small id="updated"></small></h1>
+    </div>
+    <div class="search"><svg class="ic"><use href="#i-search"/></svg>
+      <input id="fSearch" placeholder="搜文案 / hashtag / 账号"></div>
+    <select id="fTracker"><option value="">全部 Tracker</option></select>
+    <select id="fComp"><option value="">全部 Competitor</option></select>
+    <select id="fSort">
+      <option value="x">按 爆款倍数 (vs 自家平均)</option>
+      <option value="score">按 Viral Score</option>
+      <option value="er">按 Engagement Rate</option>
+      <option value="comments">按 Comments</option>
+      <option value="likes">按 Likes</option>
+      <option value="date">按 最新日期</option>
+    </select>
+    <button class="btn" id="fVideo"><svg class="ic"><use href="#i-video"/></svg>只看视频</button>
+
+    <a class="btn" href="team.html" target="_top" title="工作台"><svg class="ic"><use href="#i-users"/></svg>工作台</a>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="chips" id="presets"></div>
+  <div class="chips" id="trends"></div>
+</header>
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none"><svg class="ic"><use href="#i-search"/></svg>没有符合条件的帖子</div>
+  <div class="more" id="moreWrap" style="display:none"><button id="moreBtn">载入更多</button></div>
+</main>
+<footer>数据来源 Supabase · every monday自动更新 · 状态更改即时同步全团队 · 视频由 Instagram 官方 embed 播放</footer>
+<div id="toast"></div>
+<script id="data" type="application/json">[{"id": "DeHJPOyBool", "tracker": "agency_radar 竞对", "competitor": "goldenluzonhk", "caption": "成日聽人講「菲律賓男人唔洗做，等姐姐養」？\n呢個絕對係一個大誤會 ❌！\n\n真相係菲律賓男人係當地辛苦打工\n每日平均只係賺得 200 披索（大約 $25 港紙）\n做足一個月，人工大約只得 $750 港紙\n\n姐姐寄錢返鄉下，係因為全家嘅生活費根本唔夠洗！\n\n想知更多外傭小知識同真實故事？\n快啲 Follow 金呂宋了解更多 💡！\n-\n💛 一站式外傭服務 海外僱傭配對 自携外傭\n❤️ 菲印華僑主理 熟悉三地文化 真正融入家中\n💙 超過10年經驗 分店偏佈港九新界\n勞工處職業介紹所牌照號碼 83679\n菲律賓駐港領事館認可之僱傭牌照\nMWOHK-2024-356-105\n-\n📞 +852 3618 4871\n📱 +852 8404 6393 (24小時WhatsApp)\n📩 goldenluzonhk@gmail.com\n⏰ 10AM – 6PM（Mon – Sun)", "transcript": "我想問Felipino男人是否也不工作等姐姐養的不是老公不工作是他們一個月的人工才等於姐姐在香港回五天的錢在菲律賓平均來說每天賺大約200元即25元港幣一個月的人工大約才750元港幣姐姐記錢回鄉不是因為有人等養是因為一個家庭的生活費根本就不夠很多時候小朋友、妹妹的學費爸爸的藥費家裡漏水等等的維修費都要靠姐姐的收入去維持當然有些男人不工作但也不代表全部菲律賓的男人都不工作想知道更多請我們深履送", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 75, "comments": 4, "er": 123.44, "followers": 64, "date": "2026-10-05", "url": "https://www.instagram.com/p/DeHJPOyBool/", "video": true, "ratio": 0, "score": 135.94, "status": "未处理", "x": 3.0}, {"id": "DcGe2sFvQK9", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "一個月養車要用幾錢? 大概一萬左右\n條數計落好似係幾乸脷 \n但鐘意揸車嘅人係唔會因為咁唔養車😂 \n只好逼自己努力啲搵錢！🔥😂\n\n車主們你哋養車又要用幾多錢呢?\n\n#香港揸車 #養車開支 #電動車 #Tesla", "transcript": "香港養價TESLA Model 3 Performance你一個養車用多少錢?養車大概一萬頭左右因為我住村東的關係車位只有1000元外界拍車連充電大概4000多元一個月電車最大的選號就是電太因為電很重一般走一萬里就要換太四條好像要8,9000元保險大概5000元一年排費就3000元一年我上會的所以會貴一點點睡不保險而且因為上會一定要買全部一般買第三者寶其實就沒那麼貴那你都幾久了?不要計算,喜歡的而且方便很多因為香港是炸電車性價比很高現在我們先賺錢", "brk": "", "tags": "香港揸車, 養車開支, 電動車, Tesla", "bait": false, "type": "Video", "likes": 892, "comments": 97, "er": 61.24, "followers": 1615, "date": "2026-08-16", "url": "https://www.instagram.com/p/DcGe2sFvQK9/", "video": true, "ratio": 0, "score": 73.25, "status": "未处理", "x": 11.6}, {"id": "DcGb4_IhSIp", "tracker": "agency_radar 竞对", "competitor": "goldenluzonhk", "caption": "🚨 揭開姐姐放假必食炸雞之謎！\n🚨 以為佢哋淨係鍾意食香口嘢？錯啦！🙅‍♂️\n\nJollibee = 童年回憶，真正嘅家鄉味！ \nKFC = 聖誕傳統，等同我哋過年食盆菜！\n每次放假食炸雞，都係為咗一解思鄉之愁啊🥺\n\n你屋企姐姐係 Jollibee 死忠定 KFC 粉絲？ \n留個 emoji 話我知！ \n🍗 = Jollibee 🍟 = KFC \n\n-\n💛 一站式外傭服務 海外僱傭配對 自携外傭\n❤️ 菲印華僑主理 熟悉三地文化 真正融入家中\n💙 超過10年經驗 分店偏佈港九新界\n勞工處職業介紹所牌照號碼 79894\n菲律賓駐港領事館認可之僱傭牌照\nMWOHK-2024-356-105\n-\n📞 +852 3618 4871\n📱 +852 8404 6393 (24小時WhatsApp)\n📩 goldenluzonhk@gmail.com\n⏰ 10AM – 6PM（Mon – Sun)\n\n#香港外傭 #JollibeeHK #菲律賓文化 #香港僱主", "transcript": "你有沒有想過,為什麼姐姐放假不會去茶餐廳,不會去麥當勞多數去Jolly Bee不是因為他們喜歡吃光東西,背後有一個想不到的原因Jolly Bee的味道是菲律賓人從小吃到大的家鄉味,在香港找不到他們的味道唯有去Jolly Bee,KFC是另一個故事在菲律賓聖誕節,吃一桶桶KFC是傳統就好像香港人過年會吃盤菜,而吃Jolly Bee是找回家鄉的感覺你家裡的工人姐姐是KFC那批還是Jolly Bee那批?留言告訴我", "brk": "", "tags": "香港外傭, JollibeeHK, 菲律賓文化, 香港僱主", "bait": false, "type": "Video", "likes": 26, "comments": 1, "er": 42.19, "followers": 64, "date": "2026-08-16", "url": "https://www.instagram.com/p/DcGb4_IhSIp/", "video": true, "ratio": 0, "score": 45.31, "status": "未处理", "x": 1.0}, {"id": "DcaquXVOxgk", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "Case closed. 😎", "transcript": "瑪莉亞 我的公司已經不見了", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 1148, "comments": 8, "er": 32.5, "followers": 3557, "date": "2026-08-24", "url": "https://www.instagram.com/p/DcaquXVOxgk/", "video": true, "ratio": 0, "score": 32.95, "status": "未处理", "x": 3.8}, {"id": "Db5HIVxOBgP", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "唔係咁容易架😢", "transcript": "Maria,你想關燈就跟他說Turn off the light就可以Yes SirTurn off the light燈還沒關It doesn't listen Sir", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 819, "comments": 3, "er": 23.11, "followers": 3557, "date": "2026-08-11", "url": "https://www.instagram.com/p/Db5HIVxOBgP/", "video": true, "ratio": 0, "score": 23.28, "status": "未处理", "x": 2.7}, {"id": "DdtPoddhPmB", "tracker": "agency_radar 竞对", "competitor": "goldenluzonhk", "caption": "屋企位姐姐都有呢個「無飯不歡」嘅小習慣嗎？🍚 \n如果仲想知咩姐姐小習慣，留言話我哋知啦！👇\n-\n💛 一站式外傭服務 海外僱傭配對 自携外傭\n❤️ 菲印華僑主理 熟悉三地文化 真正融入家中\n💙 超過10年經驗 分店偏佈港九新界\n勞工處職業介紹所牌照號碼 83679\n菲律賓駐港領事館認可之僱傭牌照\nMWOHK-2024-356-105\n-\n📞 +852 3618 4871\n📱 +852 8404 6393 (24小時WhatsApp)\n📩 goldenluzonhk@gmail.com\n⏰ 10AM – 6PM（Mon – Sun)", "transcript": "", "brk": "", "tags": "", "bait": true, "type": "Video", "likes": 14, "comments": 0, "er": 21.88, "followers": 64, "date": "2026-09-25", "url": "https://www.instagram.com/p/DdtPoddhPmB/", "video": true, "ratio": 0, "score": 21.88, "status": "未处理", "x": 0.5}, {"id": "DdYrIEaOc1I", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "視藝科功課 💯", "transcript": "Maria 幫我填顏色公仔上面寫了誰的名字Teamwork", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 724, "comments": 4, "er": 20.47, "followers": 3557, "date": "2026-09-17", "url": "https://www.instagram.com/p/DdYrIEaOc1I/", "video": true, "ratio": 0, "score": 20.69, "status": "未处理", "x": 2.4}, {"id": "DcuZ-t6uLVx", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "今朝大家一切順利嗎? 😴", "transcript": "Hey, Zo, hey, Senla, finally back. Hey, Senla! Good morning, finally.", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 677, "comments": 9, "er": 19.29, "followers": 3557, "date": "2026-09-01", "url": "https://www.instagram.com/p/DcuZ-t6uLVx/", "video": true, "ratio": 0, "score": 19.79, "status": "未处理", "x": 2.3}, {"id": "DOOOIySD9aV", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "人生永遠都會遇到好多挑戰，挫敗\n呢幾年好似探險咁，不停探索自己\n思考人生為何，活着到底有咩意義？\n多啲體驗世界，令到自己有故事，\n就係活着嘅最好證明🤓\n搏盡，無悔\nKeep going! It’s always too early to quit.\n\n#創業之路 #人生意義是什麼 #個人成長", "transcript": "問總比想像中精彩如果有人跟這個7年前剛入郵的死皮仔說你讀了一年就會肥腰之後不打不撞去到美容院做摩帝新銷售試過連續幾個月只有兩三千元連吃飯都要滷卡找免費等不信轉行做pro卡捱到公司拖涼減用同時走曬到阿媽做顧容叫我幫忙因為各種問題令到未必結業同一年阿爸在泰國旅行被車撞住了三個星期ICU家有火燭我家要住在朋友頭當我願意命運為什麼要這樣對我的時候突然有人說過要為自己人辛苦責任說念開心有一天不開心有一天為什麼不選擇開心生活每天呢於是我決定重新出發幾年時間我決定開自己的僱傭公司從一個人到七個人團隊這段創業路一點都不簡單中間想過無數次要放棄但聽到客人跟你說好多謝你這個公民姐姐是我這幾年請過最好的又或者聽到姐姐說找到好僱主我就知道這一切的堅持都是值得好感恩能夠陪伴公司同時同自己一路成長終於可以靠自己的努力照顧回家得到身邊的人的肯定這個死皮仔聽完之後一定會心臟但沒錯這就是我這幾年的工作人生得意的地方正正是你永遠都猜不到你的下一步是什麼沒有這幾年的迷惘壯板意外豐富就不會有今天的我擁抱未知宇宙安排的劇情永遠比你想得更精彩", "brk": "", "tags": "創業之路, 人生意義是什麼, 個人成長", "bait": false, "type": "Video", "likes": 159, "comments": 24, "er": 11.33, "followers": 1615, "date": "2025-09-05", "url": "https://www.instagram.com/p/DOOOIySD9aV/", "video": true, "ratio": 0, "score": 14.3, "status": "未处理", "x": 2.3}, {"id": "DVvrsXRkxvW", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "請工人最驚遇到咩？\n隱藏收費多？定係請返黎先發現唔夾？🤦‍♀️\n\n香港好多雙職家庭想請工人幫手湊B或者照顧長者\n但又無從入手?\n\n我哋公司主打「無隱藏收費」同「透明化流程」： \n✅ 初步諮詢： 了解家庭結構、預算，講清流程同費用 \n✅ 深度評估： 根據屋企實際需要，分析請本地/海外、新手/有經驗姐姐嘅優缺點 \n✅ 精準配對： 喺龐大Database篩選合適人選，安排面試把關\n每個家庭嘅需要都唔同，唔好再靠彩數請人啦！等我用經驗幫你分析啦！\n\n唔想行冤枉路？交畀專業嘅我哋！ \n💬 即刻留言**「工人」**，\n即享 30 分鐘免費一對一諮詢，為你嘅家庭搵個最強後盾！\n\n#工人姐姐 #請工人 #香港僱傭中心 #外傭配對 #海鋒僱傭", "transcript": "很多人問我,Michael,為什麼這麼多女?我都不知道,甚至不是叫Michael,我叫Johnny我只知道我公司有很多工人通常我們收到查詢後,都會有個電話資訊了解為何你想請姐姐家庭的結構,跟你講清楚流程時間,費用範圍所有資料透明,無人床收費如果初步適合,我們會再做一個深入的資訊了解行業需要家裡的實際情況,工人姐姐的要求等等因為每個僱主的家庭狀況都不同我們會用我們的經驗成為僱主和工人姐姐之間的橋段根據你們的實際情況,比專業意見例如,哪個地方的姐姐本地,海外,有經驗,新手在收拾所有資料後我們會開始在我們的工人姐姐data base幫你找合適的工人姐姐安排面試,再和你分析每個姐姐的優缺點很多人都以為請工人很貴其實只要15000到200元已經可以幫你找個合適的工人姐姐立刻留言工人我送你一個30分鐘的免費資訊", "brk": "", "tags": "工人姐姐, 請工人, 香港僱傭中心, 外傭配對, 海鋒僱傭", "bait": true, "type": "Video", "likes": 93, "comments": 26, "er": 7.37, "followers": 1615, "date": "2026-03-06", "url": "https://www.instagram.com/p/DVvrsXRkxvW/", "video": true, "ratio": 0, "score": 10.59, "status": "未处理", "x": 1.7}, {"id": "Dc7eBIYOSMM", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "Good Show!", "transcript": "Maria 待會幫Hazel和婆婆影片打電話給她Yes, Ma'am婆婆早安Mis...她這麼認真Live show, Ma'am", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 336, "comments": 3, "er": 9.53, "followers": 3557, "date": "2026-09-06", "url": "https://www.instagram.com/p/Dc7eBIYOSMM/", "video": true, "ratio": 0, "score": 9.7, "status": "未处理", "x": 1.1}, {"id": "DdJM-Q7yZUQ", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "如果人工真係加到$6,700/月 \n大家仲會唔會請工人姐姐?\n\n不過僱主都唔需要太過擔心\n因為以往以往一般加都係百幾咁加\n唔會一下加40%\n\n#外傭加薪 #香港街訪", "transcript": "自從那時候三千多到現在變成六千多覺得很不合理我覺得是很貴的我覺得貴了一點香港請客也要買五萬元我最少為什麼覺得六千七很多呢那不同普通照顧小朋友或者一個五千五我覺得比較貴我自己也請了這麼多年工人抽到你帶了很貴那還請不請工人可以不請都不請都要請八九千都要請其實現在差不多八九千三萬小叔六千七是多一點的加了差不多四成很少說一來就要求他加人工加四十十成的你香港打工仔都沒有那麼誇張有些僱主見到之後就下架那麼多即是馬上不想請工人對僱主來說其實是很大壓力的他們愛用工會和政府交的一個刊判記載來的我覺得", "brk": "", "tags": "外傭加薪, 香港街訪", "bait": false, "type": "Video", "likes": 120, "comments": 9, "er": 7.99, "followers": 1615, "date": "2026-09-11", "url": "https://www.instagram.com/p/DdJM-Q7yZUQ/", "video": true, "ratio": 0, "score": 9.1, "status": "未处理", "x": 1.4}, {"id": "Dcf4-uxudr3", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "人多好辦事 😂", "transcript": "", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 297, "comments": 8, "er": 8.57, "followers": 3557, "date": "2026-08-26", "url": "https://www.instagram.com/p/Dcf4-uxudr3/", "video": true, "ratio": 0, "score": 9.02, "status": "未处理", "x": 1.0}, {"id": "DcDObyAOB7l", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "so many homeworks 😢", "transcript": "我不想做了1家工作 1點1分鐘我可不可以儲10分鐘一次過湧?OK 但先完成5個", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 306, "comments": 3, "er": 8.69, "followers": 3557, "date": "2026-08-15", "url": "https://www.instagram.com/p/DcDObyAOB7l/", "video": true, "ratio": 0, "score": 8.86, "status": "未处理", "x": 1.0}, {"id": "DdL1Pqsuluo", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "tomorrow again😍", "transcript": "瑪莉亞幫我吹氣球摸?明天", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 294, "comments": 6, "er": 8.43, "followers": 3557, "date": "2026-09-12", "url": "https://www.instagram.com/p/DdL1Pqsuluo/", "video": true, "ratio": 0, "score": 8.77, "status": "未处理", "x": 1.0}, {"id": "Dc3LjKfvmbi", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "好多僱主以為炒人係一件好小事\n但其實勞工法例同平機會條例絕對唔可以睇小\n\n點解今次會搞到咁大件事？ \n👉 敏感時間點：病發後即刻炒人，容易惹人懷疑\n👉 欠缺合理解釋：無白紙黑字講明係因為工作表現差\n👉 痛失醫療福利：令姐姐喺異鄉失去公共醫療保障，引發同情\n\n各位僱主，如果你唔想面對同樣嘅法律風險，\n一定要記低以下 3 招自保招數： \n1️⃣ 制定標準流程：警告 ➡️ 培訓 ➡️ 解僱，要有規有矩！ \n2️⃣ 詳盡記錄習慣：做錯事最好有白紙黑字寫低\n3️⃣ 提供合理便利：證明你對事唔對人！\n\n想知更多保障自己同管理工人姐姐嘅實用資訊？\n即刻 Follow 我啦！👇💼\n\n#香港僱主 #外傭勞工法例  #工人姐姐 #解僱賠償", "transcript": "看看那則新聞因為工人姐姐生子宮頸男發現三天後就被僱主炒了僱主以為很少時年齡都沒有上而最終發覺是判了僱主一產質歧視需要賠償25萬港元有幾個原因因為被人炒的時間極度緊急僱主信又沒有解釋清楚是不是因為工作變異問題而解僱而因為工作簽證失效令姐姐都享受不了香港公共醫療的福利一個在異鄉生活的人突然間失去所有的醫學可想而知傷害有多大這則新聞令很多有請工人姐姐的僱主覺得很緊張以後有些姐姐一有病有痛做得好不好都不可以炒呢僱主有幾招自保招數要制定標準流程評估員工表現建立一個紀律的處分程序如果她真的做得不好要先警告再培訓最後先炒人要去長進的紀錄習慣記錄她犯錯的事實例如她早退遲到早白子黑字寫下假如一個殘疾員工表現不好你的關注點應該是看她行不行她的工作要求法律是要求僱主提供合理的便利例如暫時減輕粗重工夫或安排適當的休息給她用同一把車去管理證明對事不對人這樣就安全得多了科羅河繼續分享更多不同的工人姐姐資訊", "brk": "", "tags": "香港僱主, 外傭勞工法例, 工人姐姐, 解僱賠償", "bait": false, "type": "Video", "likes": 126, "comments": 2, "er": 7.93, "followers": 1615, "date": "2026-09-04", "url": "https://www.instagram.com/p/Dc3LjKfvmbi/", "video": true, "ratio": 0, "score": 8.17, "status": "未处理", "x": 1.3}, {"id": "DPlkaRbj_gP", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "傳說中合法嘅human trafficking🫣\n其實係幫人搵工啫🤣\n#headhunting \n#職業介紹所\n#工人姐姐 \n#工人姐姐培訓班", "transcript": "大家一陣子在家裡問我要一個人Fabra叮嘗試其實我喜歡去見這姐姐我們Agent可以看看有很多地方香港其中一個地方我們現在上去看看Hello everyoneHello我們看看很多姐姐在跟姐姐見空前我們會做一個breathing講清楚工作範圍以及安排為期3個星期的免費讓他們來到馬上幫忙不會那麼容易叫辛苦就辭職工作不用再整天懷疑誰做家務草鴿所以平時一上在Carol分裂的辦公室就是這樣補人的我每個人都會一致的為何我都要給這麼多的主人最後如果你們身邊有人是要找公仁姐姐請一定要介紹給我除了每個月親自去給她跟公仁之外因你姐姐我們都有很多的選擇我們的團隊一定會給最好的服務大家", "brk": "", "tags": "headhunting, 職業介紹所, 工人姐姐, 工人姐姐培訓班", "bait": false, "type": "Video", "likes": 88, "comments": 7, "er": 5.88, "followers": 1615, "date": "2025-10-09", "url": "https://www.instagram.com/p/DPlkaRbj_gP/", "video": true, "ratio": 0, "score": 6.75, "status": "未处理", "x": 1.1}, {"id": "Db5cmcDv2YX", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "我覺得印尼姐姐靚啲，見人見智😂\n\n其實兩種姐姐各有千秋\n冇話邊個絕對最好，最緊要係夾到你屋企嘅實際需要！ \n\n想知邊個姐姐最啱你？ \n👇🏻 即刻留言「配對」，送你30分鐘免費諮詢 \n\n#香港請姐姐 #印尼姐姐 #菲律賓姐姐 #外傭配對 #快問快答", "transcript": "", "brk": "", "tags": "香港請姐姐, 印尼姐姐, 菲律賓姐姐, 外傭配對, 快問快答", "bait": true, "type": "Video", "likes": 66, "comments": 12, "er": 4.83, "followers": 1615, "date": "2026-08-11", "url": "https://www.instagram.com/p/Db5cmcDv2YX/", "video": true, "ratio": 0, "score": 6.32, "status": "未处理", "x": 1.0}, {"id": "DcQrLq3pjWG", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "等下個月又有budget", "transcript": "今天月電費很貴 Maria我家省電 ok?Yes ma'am啊可不可以多開一盞燈electricity budget finished ma'am", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 214, "comments": 0, "er": 6.02, "followers": 3557, "date": "2026-08-20", "url": "https://www.instagram.com/p/DcQrLq3pjWG/", "video": true, "ratio": 0, "score": 6.02, "status": "未处理", "x": 0.7}, {"id": "DcpkmFSu7TA", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "食得未, 好肚餓呀", "transcript": "Tất cả xin, xin tiết xin nhận cho sợ, ok? Yes, ma'am Xách tập mày à One more angle, ma'am", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 192, "comments": 3, "er": 5.48, "followers": 3557, "date": "2026-08-30", "url": "https://www.instagram.com/p/DcpkmFSu7TA/", "video": true, "ratio": 0, "score": 5.65, "status": "未处理", "x": 0.6}, {"id": "DcLgeTLvff4", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "請工人姐姐最驚遇到咩事？相信「借錢」同「大肚」 \n作為中介，我哋見盡無數僱主面對呢啲情況時嘅無助與苦惱 \n\n其實對比鄰近嘅新加坡，香港喺外傭監管上真係寬鬆好多 \n到底香港係咪時候要參考其他地方嘅做法，保障返僱主權益？\n\n你又點睇？歡迎留言交流下！ 🤔 \n\n#香港外傭 #外傭借錢 #外傭中介 #工人姐姐 #香港僱主", "transcript": "", "brk": "", "tags": "香港外傭, 外傭借錢, 外傭中介, 工人姐姐, 香港僱主", "bait": true, "type": "Video", "likes": 76, "comments": 3, "er": 4.89, "followers": 1615, "date": "2026-08-18", "url": "https://www.instagram.com/p/DcLgeTLvff4/", "video": true, "ratio": 0, "score": 5.26, "status": "未处理", "x": 0.8}, {"id": "Db-VolpO1u1", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "落街跑個圈又可以再食過🤤", "transcript": "今天自助餐要吃夠本先就好Yes ma'am還吃得下嗎Almost balanced ma'am", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 167, "comments": 1, "er": 4.72, "followers": 3557, "date": "2026-08-13", "url": "https://www.instagram.com/p/Db-VolpO1u1/", "video": true, "ratio": 0, "score": 4.78, "status": "未处理", "x": 0.5}, {"id": "DeL314QAF3Z", "tracker": "agency_radar 竞对", "competitor": "my.sweet.home.hk", "caption": "【窩心時刻｜安樂窩14周年晚宴圓滿舉行✨】\n\n安樂窩僱傭中心14歲生日喇！🎂\n\n周年晚宴當晚我哋團隊齊齊聚首一堂，共同慶祝呢個特別嘅里程碑🥂今次晚宴好榮幸邀請到方皓玟小姐蒞臨表演🎤精彩嘅演出令全場氣氛極之熱烈！\n\n感謝各位僱主一直以來的信任與支持、每一位團隊成員嘅付出、以及每一位姐姐嘅努力。未來，安樂窩會繼續秉持專業、貼心嘅態度，提供最優質嘅僱傭配對服務，繼續陪伴無數香港家庭尋找心水外傭，為大家打造溫暖安心嘅「安樂窩」🏡。\n\n快啲去片睇吓當晚嘅精彩花絮啦～\n\n🏠安樂窩僱傭中心| 𝓕𝓮𝓮𝓵 得到的窩心❣️\n－－－－－－－－－－－－－－－－－\n📱| https://wa.me/85226990833\n🌐| https://www.mysweethome.hk\n🎥| https://www.youtube.com/@mysweethomeagency\n🏢| 中環、上環、銅鑼灣、海怡、康怡、將軍澳、日出康城、港鐵九龍站、港鐵香港站、奧海城、荔枝角、荃灣西、荃灣、沙田、屯門、Yoho Plus、Yoho Mall II\n#安樂窩僱傭中心 #14週年 #周年晚宴 #僱傭中介 #香港家庭", "transcript": "歡迎來到安樂屋 週年晚夜202614歲 14年換表話講 換信一下 大概超過了5000個日月夜5000日內可以做什麼呢 我可以告訴你可以足以由一粒種子 變成一棵茂密的大樹由一開始設定一個目標 覺得很意想不到 沒有可能到時候真的要硬調硬碼 要去試了最後完成了那我們在這個時刻不如給你一些掌聲 給你旁邊的同事跟我說你去厲害 一定可以一起將這個幫人的心 發光發亮再可以影響多一點的人我們乾杯長輩 長輩 長輩長輩 長輩 長輩見到大家的成長和成功很開心希望在未來再多一點機會在不同的崗位上繼續努力 謝謝有個人的心 想不斷面對挑戰不要怕事底 千萬不要怕事底這裡每個人都會成功的 謝謝在這個地方可以找到自己的價值可以找到更好的自己 謝謝你們一個人對你的信任他能夠將他的朋友 他的家人介紹給你那你一定要用心去做好他我自己一個人到底是沒有用的謝謝你謝謝你謝謝你謝謝你謝謝你我自己一個人到底是沒有用的謝謝所有公司遇過的人和事讓我一步一步慢慢地去成長和進步我是李永奕 我的政策", "brk": "", "tags": "安樂窩僱傭中心, 14週年, 周年晚宴, 僱傭中介, 香港家庭", "bait": false, "type": "Video", "likes": 10, "comments": 0, "er": 4.33, "followers": 231, "date": "2026-10-07", "url": "https://www.instagram.com/p/DeL314QAF3Z/", "video": true, "ratio": 0, "score": 4.33, "status": "未处理", "x": 1.0}, {"id": "DdGyYrtiC_L", "tracker": "agency_radar 竞对", "competitor": "my.sweet.home.hk", "caption": "【窩心指南｜2027年曆卡+法定假期表出爐喇🗓️】\n\n又到咗要為新一年做準備嘅時候啦～想提早規劃好屋企姐姐嘅放假安排？\n安樂窩僱傭中心已經為大家準備好2027嘅年曆卡，內容清晰易明，一眼就分清邊日係公眾假期或者係法定假日，僱主同姐姐安排假期自然無難度✨\n\n想拎到呢張超實用嘅年曆卡非常簡單！只要喺呢個Post留言「+1」，我哋就會即刻PM電子版畀你。如果對2027嘅假期安排有任何疑問，或者想親臨門市免費索取實體年曆卡，歡迎隨時聯絡你嘅專屬僱傭顧問～\n\n🏠安樂窩僱傭中心| 𝓕𝓮𝓮𝓵 得到的窩心❣️\n－－－－－－－－－－－－－－－－－\n📱| https://wa.me/85226990833\n🌐| https://www.mysweethome.hk\n🎥| https://www.youtube.com/@mysweethomeagency\n🏢| 中環、上環、銅鑼灣、海怡、康怡、將軍澳、日出康城、港鐵九龍站、港鐵香港站、奧海城、荔枝角、荃灣西、荃灣、沙田、屯門、Yoho Plus、Yoho Mall II\n#安樂窩僱傭中心 #外傭假期安排 #外傭假期 #2027年曆卡 #2027法定假期", "transcript": "", "brk": "", "tags": "安樂窩僱傭中心, 外傭假期安排, 外傭假期, 2027年曆卡, 2027法定假期", "bait": true, "type": "Carousel", "likes": 4, "comments": 2, "er": 2.6, "followers": 231, "date": "2026-09-10", "url": "https://www.instagram.com/p/DdGyYrtiC_L/", "video": false, "ratio": 0, "score": 4.33, "status": "未处理", "x": 1.0}, {"id": "DclLk1BORib", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "邊度可以買到呢部機?", "transcript": "Maria, mahu mel Important?verti cozy kamu reka Sign�", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 133, "comments": 4, "er": 3.85, "followers": 3557, "date": "2026-08-28", "url": "https://www.instagram.com/p/DclLk1BORib/", "video": true, "ratio": 0, "score": 4.08, "status": "未处理", "x": 0.5}, {"id": "DdmIIoIuAvf", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "Happy Birthday to Sir 🥳", "transcript": "37, 38, 39, 40 Sao em sấy cầm? Acrid birthday, sir", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 137, "comments": 2, "er": 3.91, "followers": 3557, "date": "2026-09-22", "url": "https://www.instagram.com/p/DdmIIoIuAvf/", "video": true, "ratio": 0, "score": 4.02, "status": "未处理", "x": 0.5}, {"id": "DcyFFtuPYZ1", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "唔少僱主遇到「財仔收數信」都會好慌張，其實真係唔使驚！\n\n跟住呢幾個步驟做就搞掂： \n1️⃣ 炒工人前，填妥入境處嘅終止合約通知書（ID407E）📝 \n2️⃣ 等入境處寄返封「確認通知書」俾你 ✉️ \n3️⃣ 將呢封確認信 WhatsApp 或 Email send 返財務公司 📤\n\n通常財仔收到證明，知道個工人已經唔喺度做，就唔會再騷擾你！\n\n#香港僱主日常 #工人姐姐借錢 #外傭問題", "transcript": "這個功能10天後就收到光信兄弟的信Outstanding包含費5萬多元部分今晚差不多開始到期這些情況點部署因為尋常不擔心假設真的在家裡的姐姐借錢也走了一般情況你一定會已經炒工人炒工人之前每天一封入點署的ID4072裡面寫完原因他去最後幾時幾時炒了入點署之後suppose他就會給一封確認通知書你將這封確認通知書WhatsApp或者email寫回給重播公司理論上他們應該不會再騷擾你頂多都是摸寫牌理或者問問你姐姐還在做一般你去說他已經不在做了他自己會或者你炒了他一般就不會再騷擾你了Share這條影片給你身邊有請工人姐姐的朋友", "brk": "", "tags": "香港僱主日常, 工人姐姐借錢, 外傭問題", "bait": false, "type": "Video", "likes": 51, "comments": 4, "er": 3.41, "followers": 1615, "date": "2026-09-02", "url": "https://www.instagram.com/p/DcyFFtuPYZ1/", "video": true, "ratio": 0, "score": 3.9, "status": "未处理", "x": 0.6}, {"id": "DdBljkkOb8L", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "剛剛好 無多無少~", "transcript": "Maria, hơi mặt bún găn chú yếu. Yes, mam! Mặt đi chú yếu sẽ không sảy cầm lòi. Exactly half cat tít mam.", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 129, "comments": 1, "er": 3.65, "followers": 3557, "date": "2026-09-08", "url": "https://www.instagram.com/p/DdBljkkOb8L/", "video": true, "ratio": 0, "score": 3.71, "status": "未处理", "x": 0.4}, {"id": "Ddi0BAduc7R", "tracker": "agency_radar 竞对", "competitor": "go.den.story", "caption": "今日Day 5, 中英數常音宗帶齊書未?", "transcript": "Đừng nhớ, đừng, check back first. Hôi cháu mày. Final check complete.", "brk": "", "tags": "", "bait": false, "type": "Video", "likes": 111, "comments": 7, "er": 3.32, "followers": 3557, "date": "2026-09-21", "url": "https://www.instagram.com/p/Ddi0BAduc7R/", "video": true, "ratio": 0, "score": 3.71, "status": "未处理", "x": 0.4}, {"id": "Dd_ZZCGvueS", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "身為聰明的僱主，你應該改問「情境題」測試佢地真實臨場反應\n另外，一定要追問前任僱主的狀況 \n\n面試真正要搵嘅唔係標準答案\n而係觀察遇到狀況時\n佢點諗，點樣做，睇睇適唔適合你地屋企真實情況🔥 \n\n想請姐姐但又怕請錯人?\n留言【面試】，SEND一份「姐姐面試問題清單」俾你 📩✨ \n\n#外傭面試 #請工人姐姐 #新手爸媽必看", "transcript": "Interview姐姐千萬不要再問她要抽B才會煮飯你要問她懂不懂大部分姐姐都會答懂但老實講答案有幾大參考價值所以我反而喜歡問一些情境題例如我會問她你怎樣煮那條菜但她中間準備的過程是怎樣例如你家有寶寶你應該要問她如果去巴亭那麼哭你第一件事會怎樣做呢如果家有老人家的你應該問她如果老人家是別親你會怎樣handle另外我一定會問她以前做過的東西例如對上個僱主家有多少人你主要是負責什麼為什麼要離開因為Interview真正要找的不是標準答案是看她遇到情況時會怎樣想怎樣做 同屋企合不合我們幫客人做match之前要了解你家的情況如何再反過來看看姐姐想找什麼工作選擇這些都是相向的所以Interview姐姐最重要是看姐姐適合自己家如果你想請姐姐但又怕請長人留意面試我發一份姐姐的面試問題清單給你", "brk": "", "tags": "外傭面試, 請工人姐姐, 新手爸媽必看", "bait": true, "type": "Video", "likes": 25, "comments": 11, "er": 2.23, "followers": 1615, "date": "2026-10-02", "url": "https://www.instagram.com/p/Dd_ZZCGvueS/", "video": true, "ratio": 0, "score": 3.59, "status": "未处理", "x": 0.6}, {"id": "Dc-oMBSvvZI", "tracker": "agency_radar 竞对", "competitor": "my.sweet.home.hk", "caption": "【窩心指南｜印尼火山爆發 最新航班及姐姐安排✈️】\n\n印尼近日火山爆發影響當地航空，包括雅加達在內共有8個機場暫時關閉。安樂窩團隊就此情況即時跟進，確認所有原定出發嘅姐姐均已安全接回訓練學校休息，安心等待最新起飛安排。\n\n我哋香港同印尼團隊會繼續密切留意最新航班動態。如閣下姐姐嘅到港行程受到影響，專屬顧問會第一時間主動聯絡跟進。如有任何查詢，歡迎隨時聯絡你哋嘅專屬顧問📞\n\n🏠安樂窩僱傭中心| 𝓕𝓮𝓮𝓵 得到的窩心❣️\n－－－－－－－－－－－－－－－－－\n📱| https://wa.me/85226990833\n🌐| https://www.mysweethome.hk\n🎥| https://www.youtube.com/@mysweethomeagency\n🏢| 中環、上環、銅鑼灣、海怡、康怡、將軍澳、日出康城、港鐵九龍站、港鐵香港站、奧海城、荔枝角、荃灣西、荃灣、沙田、屯門、Yoho Plus、Yoho Mall II\n#安樂窩僱傭中心 #印尼女傭 #印尼火山爆發 #航班動態 #到港安排", "transcript": "最根人力附生爆發,對多個幾張患了造星影響相信有印尼直接中美利亢港的姑主都很關心現在的情況事情發生後,我們已經大日時間和人力當地動態聯絡確認大家現在日制安全現在就由我們當地同事和大家共計在生情況人力當地有五個火山同事爆發其中最大乖母、最受影響的區域是接近收到牙架搭基礎一帶由於火山位置去中心,距離收到也有一段距離目前最主要影響的是火山灰、葛山都置了八個基礎暫時滾幣從昨天六日到今天大量的紅包因火山灰影響而取消包括我們學校的姐姐,部分都已經出發到機場途中收到航空公司,通知需要近距航班現時所有收到影響的姐姐都已經安全回到學校等下一節要目前火山還在爆發,我們還需要等待通知和看大家的情況是怎樣根據現時收到最新消息,基礎會均幣到今天六點我們人力當香港的團隊會繼續密聯繫密接留意當地的情況以及最新航班的安排如果直至安排受到影響,我們會盡快聯絡相關、鼓掌和協助跟進效果安排如果有音好查詢,歡迎在試圖我們污吻聯絡", "brk": "", "tags": "安樂窩僱傭中心, 印尼女傭, 印尼火山爆發, 航班動態, 到港安排", "bait": false, "type": "Video", "likes": 8, "comments": 0, "er": 3.46, "followers": 231, "date": "2026-09-07", "url": "https://www.instagram.com/p/Dc-oMBSvvZI/", "video": true, "ratio": 0, "score": 3.46, "status": "未处理", "x": 0.8}, {"id": "DdbU_oTT9x-", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "聽講好多人平時好痛苦，都係因為將人哋嘅事攬晒上身！😮‍💨 \n你有冇試過對住另一半或者小朋友講:「我都係為你好咋！」\n\n講真呢句說話其實只係你想控制人哋嘅藉口 🫢\n\n《被討厭的勇氣》入面教我哋\n每件事都有最終結果，邊個承擔個結果\n嗰個就係嗰件事嘅課題擁有者📖\n\n你分享你嘅睇法無問題，但對方跟唔跟住做，就唔到你理啦\n做好自己，劃清界線，包你煩惱少一半！\n\n👇 你最近有冇因為咩事管人哋太嚴而覺得困擾？\n歡迎留言同我分享吓！\n\n#被討厭的勇氣 #課題分離 #阿德勒心理學 #人際關係煩惱", "transcript": "我們平時的痛苦其實都是因為拿人家的課題來困擾自己而是課題分離本書的心理學家有教我們一句這件事的最終結果是由哪一個成單由哪一個成單在哪一個課題而書裡面舉一個很經典的例子就是讀書究竟是哪一個課題不讀書成單考詞成績和未來的後果是小朋友所以讀書是小朋友的課題但很多父母會用逼、罵、強迫他們讀書然後跟你說我只是為了你好你實際控制一個小朋友所以當小朋友沒有成績的時候父母都會有點不開心因為他們強行去干涉結果而阿德認為分會的角色其實不是一個監工而是一個後退你可以幫他準備好讀書的環境並不確定跟他說如果你想讀書我隨時在這裡幫你但不是一定要讀要不要讀這個責任呢要還給小朋友因為會問那是不是代表完全不可以給意見的朋友同事甚至是另一半呢其實不是的給意見和控制分別是在於你的結果的執著如果純粹是分享你的觀點對方聽不聽我也尊重那這些就支持但如果對方聽完我說對方不跟著做第三個人就覺得不爽就覺得為什麼你不聽我說其實就是為了你好實際去控制其他人所以自己都會痛苦做好自己的新性表達是我們的課題人家聽不聽你說怎樣做其實是他的課題要分析的界線是對大家人生最高的尊重你最近有沒有懷疑因為一件什麼事會令人太嚴而令自己的困擾呢歡迎大家留言去分享一下", "brk": "", "tags": "被討厭的勇氣, 課題分離, 阿德勒心理學, 人際關係煩惱", "bait": true, "type": "Video", "likes": 46, "comments": 2, "er": 2.97, "followers": 1615, "date": "2026-09-18", "url": "https://www.instagram.com/p/DdbU_oTT9x-/", "video": true, "ratio": 0, "score": 3.22, "status": "未处理", "x": 0.5}, {"id": "DdWM9nyPDZT", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "其實每個家庭嘅需求同底線都唔同\n我哋最看重嘅始終係「誠信」同「責任心」🤝 \n\n作為僱主，你哋條底線又喺邊？\n睇完條片，你覺得你屋企個姐姐值幾多分？✨ \n\n想揀個啱心水又少麻煩嘅好幫手？\nDM我哋傾傾啦！幫你搵最夾嘅姐姐！📩💪🏼 \n\n#香港僱主 #請姐姐 #外傭公司 #姐姐日常 #外傭問題", "transcript": "我無緣無故跟他說 她大好兩分差不多了你肯定在外面也會搭搭陣就算她做事好 也好始終還是給一個很大的麻煩給顧主所以都是差點有時候去賣菜的時候錢吞幾元不見了一分我四分 也不是那麼好但你說 如果她其他方面也做得很好看她顧主接受的情況如何但你問我我就覺得有點涉及到不成實的E-sum星期日出街的時候差不多9點不見了家裡 但她平時戴得很好我覺得不算去到很過分的七分差不多如果姐姐放假她也辛苦了星期日回六天公拉放假假 休息是可以的但你別過分本身答應了8點9點也有點過分有時候小朋友要照顧一下或者是老人家要看著老人家不喜歡姐姐這麼晚回家所以我覺得受到承諾的問題無論如何都會扣一點點分", "brk": "", "tags": "香港僱主, 請姐姐, 外傭公司, 姐姐日常, 外傭問題", "bait": false, "type": "Video", "likes": 38, "comments": 4, "er": 2.6, "followers": 1615, "date": "2026-09-16", "url": "https://www.instagram.com/p/DdWM9nyPDZT/", "video": true, "ratio": 0, "score": 3.1, "status": "未处理", "x": 0.5}, {"id": "DdBlsxOvAJW", "tracker": "agency_radar 竞对", "competitor": "jordanlam31777", "caption": "🚫唔需要贏喺起跑線，只需盡力贏喺終點線！🏃‍♂️💨\n俾人睇死？資源唔夠？環境限制你？\n\n佛得角對抗世界頂級強隊\n話俾全世界聽咩叫「Underdog 精神」！🔥 \n\n記住，將所有質疑嘅聲音，變成你前進嘅力量\n你手上嗰副爛牌，分分鐘係反勝嘅關鍵！\n\n你有冇試過逆境反擊嘅經歷？留言話我知啦！👇💬 \n\n#Underdog精神 #世界盃故事  #逆境自強", "transcript": "咁樣叫真正嘅Underdog精神呢就係當全世界都覺得你手上揸咗一副藍牌勸你認名嗰陣時你仍然係選擇將呢副藍牌用力比心機去打好佢今年世界盃就係一個連名都無人識嘅彈丸小國用呢種精神真含到成個地球人口得50萬嘅佛德果面對著今年嘅冠軍西巴顏珊珊首和咗0比0成為咗今年世界盃唯一一場西巴亞擊敗唔到個球隊而對住阿根廷佢哋更加係踢出咗今年世界盃我認為最最最精彩嘅場貨佢哋個農民呢和仙南今年呢個已經係40歲準備係退休喇原本呢係無人識嘅點知呢第一場波呢無奈喇變得全世界最多人follow嘅同活性2900萬個follow嘅呢個室佢證明咗呢其實唔需要贏喺起跑線只需要盡力去贏喺個終點先好多人呢成都埋完自己出身唔好啦資源唔夠啦手牌唔夠靚啦咁講真好多都係咁嘅啦但佢哋係從來都冇打算認輸嘅佛德國係冇因為自己嘅角力少啦資源少啦而放棄佢哋係世界最高嘅舞台同最強嘅對手仍然係去戰到底我希望呢又係錄到呢條片嘅你呢都記得就想人哋點樣睇低你啦環境嘅限制你啦其實唔緊要呀將呢啲質疑嘅聲音全部變咗你要做嘅目標呢你永遠係唔會知之呢日突然間就得咗Share比你一齊努力緊嘅朋友喇", "brk": "", "tags": "Underdog精神, 世界盃故事, 逆境自強", "bait": true, "type": "Video", "likes": 41, "comments": 0, "er": 2.54, "followers": 1615, "date": "2026-09-08", "url": "https://www.instagram.com/p/DdBlsxOvAJW/", "video": true, "ratio": 0, "score": 2.54, "status": "未处理", "x": 0.4}, {"id": "DdG-1qmgSzK", "tracker": "agency_radar 竞对", "competitor": "bella.maidagency", "caption": "霍哥，今次飛印尼係揀姐姐，定係帶你黎做咕喱？！🙄 @jeffreyfok_224 \n話說今次 9月7-14號，\n我哋 Bella Maid Agency 踩入印尼泗水、Banyuwangi 同 Malang 幾間訓練學校實地考察！\n本嚟想「益下」霍哥帶佢飛一趟，佢以為自己今次正啦，有免費旅行玩……🫣🫣\n點知……一開機佢就搞到我爆麥失控，成個行程笑到肚痛！💥\n\n雖然 7 日橫跨幾個地方，時間緊迫到差啲卒死，\n但我哋同霍哥真係玩盡、試盡、睇盡印尼第一線最真實嘅畫面！\n到底佢去到係幫手嚴選姐姐，定係去搞笑？\n\n想睇最貼地嘅訓練學校現場同埋霍哥嘅「亂入」實錄？\n👇 記得 Like & Follow 兼PM我哋睇【霍哥印尼突襲篇】爆笑精華！ 👇\n#Bellamaidagency #霍哥 #印尼姐姐之旅 #印尼爆笑實錄 #玩盡印尼", "transcript": "", "brk": "", "tags": "Bellamaidagency, 霍哥, 印尼姐姐之旅, 印尼爆笑實錄, 玩盡印尼", "bait": false, "type": "Video", "likes": 17, "comments": 0, "er": 1.97, "followers": 865, "date": "2026-09-10", "url": "https://www.instagram.com/p/DdG-1qmgSzK/", "video": true, "ratio": 0, "score": 1.97, "status": "未处理", "x": 1.1}, {"id": "DcdFn4GkaSN", "tracker": "agency_radar 竞对", "competitor": "bella.maidagency", "caption": "話說九月頭我要飛印尼訓練學校揀姐姐，\n我個翻譯死纏爛打話要跟埋去，我即刻SAY NO！！！\n『想跟？你留喺香港同我睇舖啦！』\n今次我搵咗個高大威猛嘅 Model/KOL 陪我去！😏\n你以為我真係去玩呀？我係想拍多啲高質又貼地嘅印尼文化，\n順便用KOL角度幫各位僱主嚴選優質姐姐！\n靚仔睇得又用得，你同我留在香港聽候指令，\n喺你印尼家鄉介紹多幾間好學校同好姐姐俾我仲實際！🙂‍↔️\n\n#訓練學校 #trainingschool #bellamaidagency", "transcript": "KIDDIN姐姐為什麼?我聽到你們左右要去一年唉 要跟著你去一年沒想到這次帶你去拜一下我的體育那你用這個嗎?我用一個很高大很英俊的KOL英俊英俊啊 那可以讓我看看他以前也是做模特兒的他很英俊會出名的不是嗎?我送給你去看多謝你留意一下我公式IG那你就見到他了為什麼我不可以回家你真的想見我老公和兒子嗎?你剛剛上個月才在日曆回來你現在快點幫我在家鄉找多家裡面有些好的KIDDIN姐姐的學校給我然後我現在直接跟她們去通商店和選一些好的KIDDIN姐姐回來香港好 問她們是否是KIDDIN姐姐是的 再見再見", "brk": "", "tags": "訓練學校, trainingschool, bellamaidagency", "bait": false, "type": "Video", "likes": 15, "comments": 0, "er": 1.73, "followers": 865, "date": "2026-08-25", "url": "https://www.instagram.com/p/DcdFn4GkaSN/", "video": true, "ratio": 0, "score": 1.73, "status": "未处理", "x": 1.0}, {"id": "Dd0FDXrj_2E", "tracker": "agency_radar 竞对", "competitor": "bella.maidagency", "caption": "政府又擬調整外傭最低工資，我心事，誰又會在意想聽？貼身照顧家人的「姐姐」如果出現偷嘢、斷約、跳工借錢，甚至對屋企人漫不經心等問題，到底憑咩加人工？\n\n僱主集體爆 seed！面對加薪議題，你覺得係物有所值，定係無奈接受？歡迎留言分享你同姐姐嘅日常苦樂！💬👇\n\n#外傭加薪 #僱主心聲 #香港僱主 #家傭問題 #Bella僱傭中心", "transcript": "", "brk": "", "tags": "外傭加薪, 僱主心聲, 香港僱主, 家傭問題, Bella僱傭中心", "bait": true, "type": "Video", "likes": 10, "comments": 0, "er": 1.16, "followers": 865, "date": "2026-09-28", "url": "https://www.instagram.com/p/Dd0FDXrj_2E/", "video": true, "ratio": 0, "score": 1.16, "status": "未处理", "x": 0.7}]</script>
+<script>
+const DATA = JSON.parse(document.getElementById('data').textContent);
+const SUPA = 'https://ypdjfsjwbfzsluleexqr.supabase.co';
+const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlwZGpmc2p3YmZ6c2x1bGVleHFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEzOTQyNTgsImV4cCI6MjEwNjk3MDI1OH0.H9a9iP8e4E2QnZIZvlmkeybkKDdIVkBnLk_yU_FhPKw';
+const STATUSES = ["未处理", "拍摄中", "已处理", "跳过"];
+document.getElementById('updated').textContent = '更新于 2026-10-09 06:23 (GMT+8)';
+const PAGE = 48;
+let shown = PAGE;
+let videoOnly = false;
+let curTab = '全部';
+
+const $ = id => document.getElementById(id);
+const fmt = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : String(n);
+const getKey = () => ANON;  // anon key is baked in — safe, can only change status
+const I = n => '<svg class="ic"><use href="#i-' + n + '"/></svg>';
+const esc = s => String(s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+const byRec = {}; DATA.forEach(d => byRec[d.id] = d);
+const TRENDS = [];
+DATA.forEach(d => {
+  d.days = d.date ? Math.max(0, Math.floor((Date.now() - new Date(d.date + 'T00:00:00')) / 864e5)) : null;
+  d.horse = d.followers > 0 && d.followers < 50000 && ((d.x || 0) >= 2 || d.score >= 10);
+});
+const PRESETS = [
+  { k: 'px', icon: 'trend', label: '真爆款 ×2+', f: d => (d.x || 0) >= 2 },
+  { k: 'pn', icon: 'star', label: '近7天', f: d => d.days !== null && d.days <= 7 },
+  { k: 'ph', icon: 'zap', label: '黑马', f: d => d.horse },
+  { k: 'pb', icon: 'magnet', label: '引流帖', f: d => d.bait },
+];
+const presetOn = {};
+
+function toast(msg, ok) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  t.style.borderColor = ok ? 'var(--green)' : 'var(--red)';
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// filters
+const comps = [...new Set(DATA.map(d => d.competitor))].sort();
+comps.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = '@'+c; $('fComp').appendChild(o); });
+[...new Set(DATA.map(d => d.tracker))].forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; $('fTracker').appendChild(o); });
+
+function matchQ(d) {
+  const q = ($('fSearch').value || '').trim().toLowerCase();
+  return !q || (d.caption + ' ' + (d.tags || '') + ' ' + (d.transcript || '') + ' ' + (d.brk || '') + ' ' + d.competitor).toLowerCase().includes(q);
+}
+
+function basePool() {
+  const t = $('fTracker').value, c = $('fComp').value;
+  return DATA.filter(d => (!t || d.tracker === t) && (!c || d.competitor === c) && (!videoOnly || d.video)
+    && matchQ(d) && PRESETS.every(p => !presetOn[p.k] || p.f(d)));
+}
+
+function filtered() {
+  const s = $('fSort').value;
+  let arr = basePool().filter(d => curTab === '全部' || d.status === curTab);
+  const key = { score:'score', er:'er', comments:'comments', likes:'likes', x:'x' }[s];
+  if (s === 'date') arr.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  else arr.sort((a,b) => (b[key]||0) - (a[key]||0));
+  return arr;
+}
+
+let dragRec = null;
+
+function renderTabs() {
+  const pool = basePool();
+  const counts = { '全部': pool.length };
+  STATUSES.forEach(s => counts[s] = pool.filter(d => d.status === s).length);
+  $('tabs').innerHTML = '';
+  ['全部', ...STATUSES].forEach(name => {
+    const el = document.createElement('div');
+    el.className = 'tab' + (curTab === name ? ' on' : '') + (name !== '全部' ? ' droppable' : '');
+    el.innerHTML = esc(name) + ' <span class="cnt">' + counts[name] + '</span>';
+    el.onclick = () => { curTab = name; shown = PAGE; render(); };
+    if (name !== '全部') {
+      el.ondragover = e => { if (dragRec) { e.preventDefault(); el.classList.add('over'); } };
+      el.ondragleave = () => el.classList.remove('over');
+      el.ondrop = e => {
+        e.preventDefault(); el.classList.remove('over');
+        const d = byRec[dragRec]; dragRec = null;
+        if (d && d.status !== name) setStatus(d, name);
+      };
+    }
+    $('tabs').appendChild(el);
+  });
+}
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target, pid = el.dataset.pid;
+      if (!el.querySelector('iframe')) {
+        const f = document.createElement('iframe');
+        f.src = 'https://www.instagram.com/p/' + pid + '/embed/';
+        f.loading = 'lazy'; f.allow = 'autoplay; encrypted-media';
+        el.appendChild(f);
+      }
+      io.unobserve(el);
+    }
+  });
+}, { rootMargin: '400px' });
+
+async function setStatus(d, val) {
+  try {
+    const r = await fetch(SUPA + '/rest/v1/posts?post_id=eq.' + encodeURIComponent(d.id), {
+      method: 'PATCH',
+      headers: { 'apikey': ANON, 'Authorization': 'Bearer ' + ANON, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ status: val })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    d.status = val;
+    cacheStatus(d.id, val);
+    toast('✓ @' + d.competitor + ' 已移到「' + val + '」', true);
+  } catch (e) {
+    toast('更新失败: ' + e.message + (String(e.message).includes('401') || String(e.message).includes('403') ? ' — 密钥无效?' : ''), false);
+  }
+  render();
+}
+
+function card(d, idx) {
+  const el = document.createElement('div');
+  el.className = 'card' + ((d.x || 0) >= 2 ? ' outlier' : '');
+  el.style.animationDelay = Math.min(idx % PAGE, 14) * 30 + 'ms';
+  el.draggable = true;
+  el.ondragstart = e => {
+    dragRec = d.id;
+    e.dataTransfer.effectAllowed = 'move';
+    el.classList.add('lifting');
+    document.body.classList.add('dragging');
+  };
+  el.ondragend = () => {
+    el.classList.remove('lifting');
+    document.body.classList.remove('dragging');
+    dragRec = null;
+  };
+  const typeIcon = d.video ? 'video' : (d.type === 'Carousel' ? 'layers' : 'image');
+  const days = d.days, horse = d.horse;
+  const ago = days === null ? '' : (days === 0 ? '今天' : days + '天前');
+  const lines = (d.caption || '').split('\n').map(l => l.trim()).filter(Boolean);
+  const hook = lines[0] || '';
+  const tr = (d.transcript && d.transcript !== '(转录失败)' && d.transcript !== '(无口播内容)') ? d.transcript : '';
+  el.innerHTML = `
+    <div class="embed" data-pid="${d.id}"><div class="ph"><svg class="ic"><use href="#i-${typeIcon}"/></svg></div></div>
+    <div class="meta">
+      <div class="row1">
+        <span class="handle" title="拖到上方 tab 即可归类">${I('grip')}</span>
+        <a class="who" href="https://www.instagram.com/${d.competitor}/" target="_blank">@${d.competitor}</a>
+        <span class="badge">${d.type || '-'}</span>
+        ${days !== null && days <= 7 ? '<span class="badge bnew">' + I('star') + '新帖</span>' : ''}
+        ${horse ? '<span class="badge bhorse">' + I('zap') + '黑马</span>' : ''}
+        ${d.bait ? '<span class="badge bbait" title="「留言XX」引流打法 — 评论被引流放大,漏斗设计值得学">' + I('magnet') + '引流</span>' : ''}
+        <span class="date" title="${d.date || ''}">${ago}</span>
+      </div>
+      <div class="nums">
+        <span class="num hot" title="Viral Score">${I('flame')}<b>${d.score}</b></span>
+        ${(d.x || 0) >= 2 ? '<span class="num x" title="是自家平均热度的多少倍">' + I('trend') + '<b>×' + d.x + '</b></span>' : ''}
+        <span class="num er" title="Engagement Rate">${I('pct')}<b>${d.er}%</b></span>
+        <span class="num" title="Likes">${I('heart')}<b>${d.likes > 0 ? fmt(d.likes) : '隐藏'}</b></span>
+        <span class="num" title="Comments">${I('msg')}<b>${fmt(d.comments)}</b></span>
+        <span class="num" title="Followers">${I('users')}<b>${fmt(d.followers)}</b></span>
+      </div>
+      <div class="cap" onclick="this.classList.toggle('open')"></div>
+      ${d.brk ? '<div class="ai" onclick="this.classList.toggle(&quot;open&quot;)"></div>' : ''}
+      <div class="srow"><label>状态</label><select class="status btn s${d.status}"></select>
+        <button class="abtn copy" title="复制完整文案">${I('copy')}文案</button>
+        ${tr ? '<button class="abtn mic" title="复制视频口播逐字稿">' + I('mic') + '口播</button>' : ''}
+        <button class="abtn brief" title="复制拍摄 Brief(数据+Hook+文案+口播稿)">${I('clip')}Brief</button>
+        <a class="abtn" href="${d.url}" target="_blank" title="打开 Instagram 原帖">${I('ext')}</a></div>
+    </div>`;
+  const capEl = el.querySelector('.cap');
+  const restTxt = lines.slice(1).join('\n');
+  capEl.innerHTML = hook ? '<b>' + esc(hook) + '</b>' + (restTxt ? '<br>' + esc(restTxt).replace(/\n/g, '<br>') : '') : '';
+  const aiEl = el.querySelector('.ai');
+  if (aiEl) aiEl.innerHTML = '<b>💡 AI 拆解</b><br>' + esc(d.brk).split(String.fromCharCode(10)).join('<br>');
+  const sel = el.querySelector('.status');
+  STATUSES.forEach(s => { const o = document.createElement('option'); o.value = s; o.textContent = s; sel.appendChild(o); });
+  sel.value = d.status;
+  sel.onchange = () => setStatus(d, sel.value);
+  el.querySelector('.copy').onclick = () =>
+    navigator.clipboard.writeText(d.caption || '').then(() => toast('✓ 文案已复制', true));
+  const micBtn = el.querySelector('.mic');
+  if (micBtn) micBtn.onclick = () =>
+    navigator.clipboard.writeText(tr).then(() => toast('✓ 口播稿已复制', true));
+  el.querySelector('.brief').onclick = () => {
+    const NL = String.fromCharCode(10);
+    const parts = ['🎬 爆款参考 @' + d.competitor + ((d.x || 0) >= 2 ? '(自家平均 ×' + d.x + ')' : ''),
+      '📊 🔥' + d.score + ' | ER ' + d.er + '% | ❤️ ' + (d.likes > 0 ? fmt(d.likes) : '隐藏') +
+      ' | 💬 ' + fmt(d.comments) + ' | 👥 ' + fmt(d.followers) + (ago ? ' | ' + ago : ''),
+      '🔗 ' + d.url, '✍️ Hook: ' + hook];
+    if (d.brk) parts.push('——— AI 拆解 ———', d.brk);
+    if (tr) parts.push('——— 口播稿 ———', tr);
+    parts.push('——— 完整文案 ———', d.caption || '');
+    navigator.clipboard.writeText(parts.join(NL)).then(() => toast('✓ Brief 已复制,可直接发给拍摄/剪辑', true));
+  };
+  io.observe(el.querySelector('.embed'));
+  return el;
+}
+
+function render() {
+  renderTabs();
+  const arr = filtered();
+  const grid = $('grid'); grid.innerHTML = '';
+  arr.slice(0, shown).forEach((d, i) => grid.appendChild(card(d, i)));
+  $('empty').style.display = arr.length ? 'none' : '';
+  $('moreWrap').style.display = arr.length > shown ? '' : 'none';
+}
+
+
+function applyStatusCache() {
+  try {
+    const c = JSON.parse(localStorage.getItem('st_cache') || '{}');
+    Object.keys(c).forEach(rid => { const d = byRec[rid]; if (d) d.status = c[rid]; });
+  } catch (e) {}
+}
+
+function cacheStatus(rid, val) {
+  try {
+    const c = JSON.parse(localStorage.getItem('st_cache') || '{}');
+    c[rid] = val; localStorage.setItem('st_cache', JSON.stringify(c));
+  } catch (e) {}
+}
+
+// live status refresh (so weekly-baked page shows current statuses)
+async function refreshStatuses() {
+  applyStatusCache(); render();  // last-known statuses first
+  if (Date.now() - (+localStorage.getItem('st_ts') || 0) < 600000) return;  // 10-min throttle
+  localStorage.setItem('st_ts', String(Date.now()));
+  const fresh = {};
+  try {
+    const r = await fetch(SUPA + '/rest/v1/posts?select=post_id,status', { headers: { 'apikey': ANON, 'Authorization': 'Bearer ' + ANON } });
+    if (!r.ok) return;
+    (await r.json()).forEach(row => {
+      const d = byRec[row.post_id];
+      if (d) d.status = row.status || '未处理';
+      if (row.status && row.status !== '未处理') fresh[row.post_id] = row.status;
+    });
+    localStorage.setItem('st_cache', JSON.stringify(fresh));
+    render();
+  } catch (e) {}
+}
+
+['fTracker','fComp','fSort'].forEach(id => $(id).onchange = () => { shown = PAGE; render(); });
+$('fSearch').oninput = () => { shown = PAGE; render(); };
+$('fVideo').onclick = () => { videoOnly = !videoOnly; $('fVideo').classList.toggle('on', videoOnly); shown = PAGE; render(); };
+$('moreBtn').onclick = () => { shown += PAGE; render(); };
+
+// preset quick filters
+$('presets').innerHTML = '<span class="lbl">快筛</span>';
+PRESETS.forEach(p => {
+  const c = document.createElement('span'); c.className = 'chip2';
+  c.innerHTML = I(p.icon) + esc(p.label);
+  c.onclick = () => { presetOn[p.k] = !presetOn[p.k]; c.classList.toggle('on', presetOn[p.k]); shown = PAGE; render(); };
+  $('presets').appendChild(c);
+});
+
+// trending hashtags among outlier posts
+if (TRENDS.length) {
+  $('trends').innerHTML = '<span class="lbl">爆款热词</span>';
+  TRENDS.forEach(([tag, n]) => {
+    const c = document.createElement('span'); c.className = 'chip2';
+    c.textContent = '#' + tag + ' ' + n;
+    c.onclick = () => { $('fSearch').value = $('fSearch').value === tag ? '' : tag; shown = PAGE; render(); };
+    $('trends').appendChild(c);
+  });
+} else { $('trends').style.display = 'none'; }
+
+render();
+refreshStatuses();
+</script>
+</body>
+</html>
